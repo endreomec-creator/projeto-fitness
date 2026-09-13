@@ -22,7 +22,6 @@
         gap: 20px;
     }
 
-    /* HEADER & FILTROS */
     .header {
         display: flex;
         justify-content: space-between;
@@ -35,18 +34,8 @@
         gap: 10px;
     }
 
-    .main-title {
-        font-size: 22pt;
-        font-weight: 900;
-        color: #38bdf8;
-        margin: 0;
-    }
-
-    .subtitle {
-        font-size: 9pt;
-        color: #94a3b8;
-        text-transform: uppercase;
-    }
+    .main-title { font-size: 22pt; font-weight: 900; color: #38bdf8; margin: 0; }
+    .subtitle { font-size: 9pt; color: #94a3b8; text-transform: uppercase; }
 
     .status-bar {
         font-size: 9.5pt;
@@ -69,7 +58,6 @@
         cursor: pointer;
     }
 
-    /* SECTION DE MÉTRICAS */
     .metrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -91,12 +79,7 @@
         margin-bottom: 10px;
     }
 
-    .scoreboard {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
+    .scoreboard { display: flex; justify-content: space-between; align-items: center; }
     .score-box { text-align: center; flex: 1; }
     .score-endreo { color: #38bdf8; font-size: 24pt; font-weight: 900; }
     .score-janaina { color: #fb7185; font-size: 24pt; font-weight: 900; }
@@ -114,21 +97,9 @@
     .bar-endreo { background: #38bdf8; height: 100%; width: 50%; transition: 0.3s; }
     .bar-janaina { background: #fb7185; height: 100%; width: 50%; transition: 0.3s; }
 
-    .detail-list {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        font-size: 9.5pt;
-    }
+    .detail-list { display: flex; flex-direction: column; gap: 8px; font-size: 9.5pt; }
+    .detail-item { display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 4px; }
 
-    .detail-item {
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 1px dashed rgba(255,255,255,0.1);
-        padding-bottom: 4px;
-    }
-
-    /* GRID DO CRONOGRAMA */
     .schedule-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -181,12 +152,7 @@
         cursor: pointer;
     }
 
-    .check-container input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        cursor: pointer;
-    }
-
+    .check-container input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
     .check-label { font-size: 7.5pt; color: #94a3b8; font-weight: 700; }
 
     .person-block.completed {
@@ -202,7 +168,6 @@
 <body>
 
 <div class="container">
-    <!-- HEADER -->
     <div class="header">
         <div>
             <div class="main-title">DASHBOARD FITNESS</div>
@@ -216,10 +181,10 @@
         </div>
     </div>
 
-    <!-- PAINEL DE MÉTRICAS -->
+    <!-- PLACAR E MÉTRICAS DO MÊS -->
     <div class="metrics-grid">
         <div class="metric-card">
-            <div class="metric-title">🏆 Placar do Mês</div>
+            <div class="metric-title">🏆 Placar do Mês (Acumulado)</div>
             <div class="scoreboard">
                 <div class="score-box">
                     <div class="name-endreo">ENDREO</div>
@@ -242,7 +207,7 @@
             <div class="detail-list">
                 <div class="detail-item"><span>🏃‍♂️ Corridas:</span> <strong id="endreoCorridas">0</strong></div>
                 <div class="detail-item"><span>🏋️‍♂️ Fortalecimento:</span> <strong id="endreoFort">0</strong></div>
-                <div class="detail-item"><span>🎯 Conclusão:</span> <strong id="endreoTaxa">0%</strong></div>
+                <div class="detail-item"><span>🎯 Conclusão do Mês:</span> <strong id="endreoTaxa">0%</strong></div>
             </div>
         </div>
 
@@ -251,18 +216,18 @@
             <div class="detail-list">
                 <div class="detail-item"><span>🏃‍♀️ Corridas:</span> <strong id="janainaCorridas">0</strong></div>
                 <div class="detail-item"><span>🏋️‍♀️ Fortalecimento:</span> <strong id="janainaFort">0</strong></div>
-                <div class="detail-item"><span>🎯 Conclusão:</span> <strong id="janainaTaxa">0%</strong></div>
+                <div class="detail-item"><span>🎯 Conclusão do Mês:</span> <strong id="janainaTaxa">0%</strong></div>
             </div>
         </div>
     </div>
 
-    <!-- GRID SEMANAL -->
+    <!-- GRADE DA SEMANA ATUAL -->
     <div class="schedule-grid">
         <!-- SEGUNDA -->
         <div class="card">
             <div class="day-title">Segunda</div>
             <div class="day-short">FEIRA</div>
-            <div class="person-block" id="blk-seg-endreo">
+            <div class="person-block">
                 <div class="name-endreo">ENDREO</div>
                 <span class="act-badge act-corrida">🏃‍♂️ Corrida</span>
                 <label class="check-container">
@@ -270,7 +235,7 @@
                     <span class="check-label">Feito</span>
                 </label>
             </div>
-            <div class="person-block" id="blk-seg-janaina">
+            <div class="person-block">
                 <div class="name-janaina">JANAÍNA</div>
                 <span class="act-badge act-fortalecimento">🏋️‍♀️ Fortalecimento</span>
                 <label class="check-container">
@@ -284,7 +249,7 @@
         <div class="card">
             <div class="day-title">Terça</div>
             <div class="day-short">FEIRA</div>
-            <div class="person-block" id="blk-ter-janaina">
+            <div class="person-block">
                 <div class="name-janaina">JANAÍNA</div>
                 <span class="act-badge act-corrida">🏃‍♀️ Corrida</span>
                 <label class="check-container">
@@ -292,7 +257,7 @@
                     <span class="check-label">Feito</span>
                 </label>
             </div>
-            <div class="person-block" id="blk-ter-endreo">
+            <div class="person-block">
                 <div class="name-endreo">ENDREO</div>
                 <span class="act-badge act-fortalecimento">🏋️‍♂️ Fortalecimento</span>
                 <label class="check-container">
@@ -316,7 +281,7 @@
         <div class="card">
             <div class="day-title">Quinta</div>
             <div class="day-short">FEIRA</div>
-            <div class="person-block" id="blk-qui-janaina">
+            <div class="person-block">
                 <div class="name-janaina">JANAÍNA</div>
                 <span class="act-badge act-corrida">🏃‍♀️ Corrida</span>
                 <label class="check-container">
@@ -324,7 +289,7 @@
                     <span class="check-label">Feito</span>
                 </label>
             </div>
-            <div class="person-block" id="blk-qui-endreo">
+            <div class="person-block">
                 <div class="name-endreo">ENDREO</div>
                 <span class="act-badge act-fortalecimento">🏋️‍♂️ Fortalecimento</span>
                 <label class="check-container">
@@ -338,7 +303,7 @@
         <div class="card">
             <div class="day-title">Sexta</div>
             <div class="day-short">FEIRA</div>
-            <div class="person-block" id="blk-sex-endreo">
+            <div class="person-block">
                 <div class="name-endreo">ENDREO</div>
                 <span class="act-badge act-corrida">🏃‍♂️ Corrida</span>
                 <label class="check-container">
@@ -346,7 +311,7 @@
                     <span class="check-label">Feito</span>
                 </label>
             </div>
-            <div class="person-block" id="blk-sex-janaina">
+            <div class="person-block">
                 <div class="name-janaina">JANAÍNA</div>
                 <span class="act-badge act-fortalecimento">🏋️‍♀️ Fortalecimento</span>
                 <label class="check-container">
@@ -360,7 +325,7 @@
         <div class="card">
             <div class="day-title">Sábado</div>
             <div class="day-short">FIM DE SEMANA</div>
-            <div class="person-block" id="blk-sab-janaina">
+            <div class="person-block">
                 <div class="name-janaina">JANAÍNA</div>
                 <span class="act-badge act-corrida">🏃‍♀️ Corrida</span>
                 <label class="check-container">
@@ -368,7 +333,7 @@
                     <span class="check-label">Feito</span>
                 </label>
             </div>
-            <div class="person-block" id="blk-sab-endreo">
+            <div class="person-block">
                 <div class="name-endreo">ENDREO</div>
                 <span class="act-badge act-corrida">🏃‍♂️ Corrida</span>
                 <label class="check-container">
@@ -393,6 +358,16 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0gHMBbnhRNtalDSVyDO3HtecNK94uNc0h1C_g2bY1Q9-1VxW_NQJWXW_BK3GUOWvH7A/exec";
     let fitnessHistory = [];
+
+    // Retorna a identificação da semana atual no ano (ex: 2026-W37)
+    function getCurrentWeekKey() {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+        const yearStart = new Date(d.getFullYear(), 0, 1);
+        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        return `${d.getFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+    }
 
     document.addEventListener("DOMContentLoaded", () => {
         populateMonthFilter();
@@ -429,7 +404,7 @@
                     type: String(row[2]),
                     date: String(row[3]),
                     monthKey: String(row[4]),
-                    checked: String(row[5]) === "true"
+                    weekKey: String(row[5])
                 }));
             } else {
                 fitnessHistory = [];
@@ -448,11 +423,12 @@
 
         const selectedMonth = document.getElementById("monthSelect").value;
         const now = new Date();
+        const currentWeekKey = getCurrentWeekKey();
         const isChecked = checkboxElement.checked;
         const action = isChecked ? "save" : "clear";
 
-        // Atualização imediata do painel local
-        fitnessHistory = fitnessHistory.filter(item => !(item.slotId === slotId && item.monthKey === selectedMonth));
+        // Atualização da lista local para sincronização instantânea na tela
+        fitnessHistory = fitnessHistory.filter(item => !(item.slotId === slotId && item.weekKey === currentWeekKey));
         if (isChecked) {
             fitnessHistory.push({
                 slotId: slotId,
@@ -460,13 +436,12 @@
                 type: activityType,
                 date: now.toISOString(),
                 monthKey: selectedMonth,
-                checked: true
+                weekKey: currentWeekKey
             });
         }
         renderDashboard();
 
-        // Envio via URL parametrizada para evitar bloqueio de CORS pelo Google Apps Script
-        const url = `${SCRIPT_URL}?action=${action}&slotId=${encodeURIComponent(slotId)}&person=${encodeURIComponent(person)}&type=${encodeURIComponent(activityType)}&date=${encodeURIComponent(now.toISOString())}&monthKey=${encodeURIComponent(selectedMonth)}`;
+        const url = `${SCRIPT_URL}?action=${action}&slotId=${encodeURIComponent(slotId)}&person=${encodeURIComponent(person)}&type=${encodeURIComponent(activityType)}&date=${encodeURIComponent(now.toISOString())}&monthKey=${encodeURIComponent(selectedMonth)}&weekKey=${encodeURIComponent(currentWeekKey)}`;
 
         try {
             await fetch(url, { mode: 'no-cors' });
@@ -478,12 +453,20 @@
 
     function renderDashboard() {
         const selectedMonth = document.getElementById("monthSelect").value;
+        const currentWeekKey = getCurrentWeekKey();
+
+        // 1. Dados do Mês Selecionado (Para os Contadores e Métricas)
         const monthData = fitnessHistory.filter(item => String(item.monthKey) === String(selectedMonth));
 
+        // 2. Dados da Semana Atual (Para marcar as caixinhas do painel visual)
+        const weekData = fitnessHistory.filter(item => String(item.weekKey) === String(currentWeekKey));
+
+        // Limpa estado visual das caixas
         document.querySelectorAll('.person-block').forEach(blk => blk.classList.remove('completed'));
         document.querySelectorAll('input[type="checkbox"]').forEach(chk => chk.checked = false);
 
-        monthData.forEach(item => {
+        // Marca APENAS os treinos realizados na SEMANA ATUAL
+        weekData.forEach(item => {
             const chk = document.querySelector(`input[onchange*="'${item.slotId}'"]`);
             if (chk) {
                 chk.checked = true;
@@ -491,6 +474,7 @@
             }
         });
 
+        // Calcula MÉTRICAS ACUMULADAS DO MÊS
         const endreoLogs = monthData.filter(i => i.person === 'Endreo');
         const janainaLogs = monthData.filter(i => i.person === 'Janaína');
 
@@ -507,7 +491,7 @@
         document.getElementById("endreoFort").innerText = eFort;
         
         document.getElementById("janainaCorridas").innerText = jCorrida;
-        document.getElementById("janainaFort").innerText = jFort;
+        document.getElementById("janainaFort.innerText = jFort;
 
         const targetMonthly = 18;
         document.getElementById("endreoTaxa").innerText = `${Math.min(100, Math.round((endreoLogs.length / targetMonthly) * 100))}%`;
