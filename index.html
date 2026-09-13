@@ -387,149 +387,144 @@
                 <div class="tag-off">DAY OFF</div>
             </div>
         </div>
-        </div>
     </div>
 </div>
 
 <script>
-    // Cole aqui o seu link do App da Web do Google Sheets
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0gHMBbnhRNtalDSVyDO3HtecNK94uNc0h1C_g2bY1Q9-1VxW_NQJWXW_BK3GUOWvH7A/exec";
-let fitnessHistory = [];
+    let fitnessHistory = [];
 
-document.addEventListener("DOMContentLoaded", () => {
-    populateMonthFilter();
-    loadDataFromSheets();
-});
-
-function populateMonthFilter() {
-    const select = document.getElementById("monthSelect");
-    const now = new Date();
-    for (let i = 0; i < 12; i++) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        const monthName = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-        
-        const opt = document.createElement("option");
-        opt.value = monthKey;
-        opt.innerText = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-        select.appendChild(opt);
-    }
-}
-
-async function loadDataFromSheets() {
-    const statusEl = document.getElementById("status");
-    statusEl.innerText = "🔄 Sincronizando com a nuvem...";
-
-    try {
-        const res = await fetch(`${SCRIPT_URL}?action=read`);
-        const data = await res.json();
-        
-        // Pula o cabeçalho e mapeia os dados da planilha
-        if (data.length > 1) {
-            fitnessHistory = data.slice(1).map(row => ({
-                slotId: String(row[0]),
-                person: String(row[1]),
-                type: String(row[2]),
-                date: String(row[3]),
-                monthKey: String(row[4]),
-                checked: String(row[5]) === "true"
-            }));
-        } else {
-            fitnessHistory = [];
-        }
-
-        statusEl.innerText = "✅ Sincronizado";
-        renderDashboard();
-    } catch (err) {
-        statusEl.innerText = "⚠️ Erro ao carregar dados";
-    }
-}
-
-async function registerActivity(slotId, person, activityType, checkboxElement) {
-    const statusEl = document.getElementById("status");
-    statusEl.innerText = "⏳ Salvando...";
-
-    const selectedMonth = document.getElementById("monthSelect").value;
-    const now = new Date();
-    const isChecked = checkboxElement.checked;
-
-    const payload = {
-        action: isChecked ? "save" : "clear",
-        slotId: slotId,
-        person: person,
-        type: activityType,
-        date: now.toISOString(),
-        monthKey: selectedMonth
-    };
-
-    // Atualiza a memória local primeiro para ser instantâneo na tela
-    fitnessHistory = fitnessHistory.filter(item => !(item.slotId === slotId && item.monthKey === selectedMonth));
-    if (isChecked) {
-        fitnessHistory.push(payload);
-    }
-    renderDashboard();
-
-    // Envia a alteração para a planilha em segundo plano
-    try {
-        await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-        statusEl.innerText = "✅ Sincronizado";
-    } catch (err) {
-        statusEl.innerText = "⚠️ Erro ao salvar na nuvem";
-    }
-}
-
-function renderDashboard() {
-    const selectedMonth = document.getElementById("monthSelect").value;
-    const monthData = fitnessHistory.filter(item => String(item.monthKey) === String(selectedMonth));
-
-    // Reseta todos os blocos visuais antes de aplicar os dados do banco
-    document.querySelectorAll('.person-block').forEach(blk => blk.classList.remove('completed'));
-    document.querySelectorAll('input[type="checkbox"]').forEach(chk => chk.checked = false);
-
-    // Marca na tela com base nos registros vindos do Google Sheets
-    monthData.forEach(item => {
-        const chk = document.querySelector(`input[onchange*="'${item.slotId}'"]`);
-        if (chk) {
-            chk.checked = true;
-            chk.closest('.person-block').classList.add('completed');
-        }
+    document.addEventListener("DOMContentLoaded", () => {
+        populateMonthFilter();
+        loadDataFromSheets();
     });
 
-    // Recalcula o placar e as estatísticas
-    const endreoLogs = monthData.filter(i => i.person === 'Endreo');
-    const janainaLogs = monthData.filter(i => i.person === 'Janaína');
-
-    const eCorrida = endreoLogs.filter(i => i.type === 'Corrida').length;
-    const eFort = endreoLogs.filter(i => i.type === 'Fortalecimento').length;
-
-    const jCorrida = janainaLogs.filter(i => i.type === 'Corrida').length;
-    const jFort = janainaLogs.filter(i => i.type === 'Fortalecimento').length;
-
-    document.getElementById("countEndreo").innerText = endreoLogs.length;
-    document.getElementById("countJanaina").innerText = janainaLogs.length;
-
-    document.getElementById("endreoCorridas").innerText = eCorrida;
-    document.getElementById("endreoFort").innerText = eFort;
-    
-    document.getElementById("janainaCorridas").innerText = jCorrida;
-    document.getElementById("janainaFort").innerText = jFort;
-
-    const targetMonthly = 18;
-    document.getElementById("endreoTaxa").innerText = `${Math.min(100, Math.round((endreoLogs.length / targetMonthly) * 100))}%`;
-    document.getElementById("janainaTaxa").innerText = `${Math.min(100, Math.round((janainaLogs.length / targetMonthly) * 100))}%`;
-
-    const total = endreoLogs.length + janainaLogs.length;
-    const barE = document.getElementById("barEndreo");
-    const barJ = document.getElementById("barJanaina");
-
-    if (total === 0) {
-        barE.style.width = "50%";
-        barJ.style.width = "50%";
-    } else {
-        barE.style.width = `${(endreoLogs.length / total) * 100}%`;
-        barJ.style.width = `${(janainaLogs.length / total) * 100}%`;
+    function populateMonthFilter() {
+        const select = document.getElementById("monthSelect");
+        const now = new Date();
+        for (let i = 0; i < 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            const monthName = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            
+            const opt = document.createElement("option");
+            opt.value = monthKey;
+            opt.innerText = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+            select.appendChild(opt);
+        }
     }
-}
+
+    async function loadDataFromSheets() {
+        const statusEl = document.getElementById("status");
+        statusEl.innerText = "🔄 Sincronizando com a nuvem...";
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=read`);
+            const data = await res.json();
+            
+            if (data.length > 1) {
+                fitnessHistory = data.slice(1).map(row => ({
+                    slotId: String(row[0]),
+                    person: String(row[1]),
+                    type: String(row[2]),
+                    date: String(row[3]),
+                    monthKey: String(row[4]),
+                    checked: String(row[5]) === "true"
+                }));
+            } else {
+                fitnessHistory = [];
+            }
+
+            statusEl.innerText = "✅ Sincronizado";
+            renderDashboard();
+        } catch (err) {
+            statusEl.innerText = "⚠️ Erro ao carregar dados";
+        }
+    }
+
+    async function registerActivity(slotId, person, activityType, checkboxElement) {
+        const statusEl = document.getElementById("status");
+        statusEl.innerText = "⏳ Salvando...";
+
+        const selectedMonth = document.getElementById("monthSelect").value;
+        const now = new Date();
+        const isChecked = checkboxElement.checked;
+        const action = isChecked ? "save" : "clear";
+
+        // Atualização imediata do painel local
+        fitnessHistory = fitnessHistory.filter(item => !(item.slotId === slotId && item.monthKey === selectedMonth));
+        if (isChecked) {
+            fitnessHistory.push({
+                slotId: slotId,
+                person: person,
+                type: activityType,
+                date: now.toISOString(),
+                monthKey: selectedMonth,
+                checked: true
+            });
+        }
+        renderDashboard();
+
+        // Envio via URL parametrizada para evitar bloqueio de CORS pelo Google Apps Script
+        const url = `${SCRIPT_URL}?action=${action}&slotId=${encodeURIComponent(slotId)}&person=${encodeURIComponent(person)}&type=${encodeURIComponent(activityType)}&date=${encodeURIComponent(now.toISOString())}&monthKey=${encodeURIComponent(selectedMonth)}`;
+
+        try {
+            await fetch(url, { mode: 'no-cors' });
+            statusEl.innerText = "✅ Sincronizado";
+        } catch (err) {
+            statusEl.innerText = "⚠️ Erro ao enviar";
+        }
+    }
+
+    function renderDashboard() {
+        const selectedMonth = document.getElementById("monthSelect").value;
+        const monthData = fitnessHistory.filter(item => String(item.monthKey) === String(selectedMonth));
+
+        document.querySelectorAll('.person-block').forEach(blk => blk.classList.remove('completed'));
+        document.querySelectorAll('input[type="checkbox"]').forEach(chk => chk.checked = false);
+
+        monthData.forEach(item => {
+            const chk = document.querySelector(`input[onchange*="'${item.slotId}'"]`);
+            if (chk) {
+                chk.checked = true;
+                chk.closest('.person-block').classList.add('completed');
+            }
+        });
+
+        const endreoLogs = monthData.filter(i => i.person === 'Endreo');
+        const janainaLogs = monthData.filter(i => i.person === 'Janaína');
+
+        const eCorrida = endreoLogs.filter(i => i.type === 'Corrida').length;
+        const eFort = endreoLogs.filter(i => i.type === 'Fortalecimento').length;
+
+        const jCorrida = janainaLogs.filter(i => i.type === 'Corrida').length;
+        const jFort = janainaLogs.filter(i => i.type === 'Fortalecimento').length;
+
+        document.getElementById("countEndreo").innerText = endreoLogs.length;
+        document.getElementById("countJanaina").innerText = janainaLogs.length;
+
+        document.getElementById("endreoCorridas").innerText = eCorrida;
+        document.getElementById("endreoFort").innerText = eFort;
+        
+        document.getElementById("janainaCorridas").innerText = jCorrida;
+        document.getElementById("janainaFort").innerText = jFort;
+
+        const targetMonthly = 18;
+        document.getElementById("endreoTaxa").innerText = `${Math.min(100, Math.round((endreoLogs.length / targetMonthly) * 100))}%`;
+        document.getElementById("janainaTaxa").innerText = `${Math.min(100, Math.round((janainaLogs.length / targetMonthly) * 100))}%`;
+
+        const total = endreoLogs.length + janainaLogs.length;
+        const barE = document.getElementById("barEndreo");
+        const barJ = document.getElementById("barJanaina");
+
+        if (total === 0) {
+            barE.style.width = "50%";
+            barJ.style.width = "50%";
+        } else {
+            barE.style.width = `${(endreoLogs.length / total) * 100}%`;
+            barJ.style.width = `${(janainaLogs.length / total) * 100}%`;
+        }
+    }
+</script>
+</body>
+</html>
