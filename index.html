@@ -2,25 +2,454 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Projeto Fitness - Sincronizado</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projeto Fitness - Dashboard & Métricas</title>
 <style>
-    body { font-family: sans-serif; background: #0f172a; color: #fff; padding: 20px; }
-    .status-loading { color: #38bdf8; font-weight: bold; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+        margin: 0;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #0f172a;
+        color: #f8fafc;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* HEADER & FILTROS */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(30, 41, 59, 0.8);
+        padding: 15px 25px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .main-title {
+        font-size: 22pt;
+        font-weight: 900;
+        color: #38bdf8;
+        margin: 0;
+    }
+
+    .subtitle {
+        font-size: 9pt;
+        color: #94a3b8;
+        text-transform: uppercase;
+    }
+
+    .status-bar {
+        font-size: 9.5pt;
+        font-weight: bold;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.1);
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .filter-group select {
+        background: #1e293b;
+        color: #f8fafc;
+        border: 1px solid #475569;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 10pt;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    /* SECTION DE MÉTRICAS */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+    }
+
+    .metric-card {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 15px;
+    }
+
+    .metric-title {
+        font-size: 10pt;
+        color: #94a3b8;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .scoreboard {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .score-box { text-align: center; flex: 1; }
+    .score-endreo { color: #38bdf8; font-size: 24pt; font-weight: 900; }
+    .score-janaina { color: #fb7185; font-size: 24pt; font-weight: 900; }
+
+    .progress-bar-bg {
+        width: 100%;
+        height: 10px;
+        background: #334155;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-top: 10px;
+        display: flex;
+    }
+
+    .bar-endreo { background: #38bdf8; height: 100%; width: 50%; transition: 0.3s; }
+    .bar-janaina { background: #fb7185; height: 100%; width: 50%; transition: 0.3s; }
+
+    .detail-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 9.5pt;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px dashed rgba(255,255,255,0.1);
+        padding-bottom: 4px;
+    }
+
+    /* GRID DO CRONOGRAMA */
+    .schedule-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+    }
+
+    .card {
+        background: rgba(30, 41, 59, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 12px 8px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .day-title { font-size: 11pt; font-weight: 800; color: #f1f5f9; text-transform: uppercase; }
+    .day-short { font-size: 8pt; color: #64748b; margin-bottom: 10px; }
+
+    .person-block {
+        background: rgba(15, 23, 42, 0.6);
+        border-radius: 8px;
+        padding: 8px 5px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: 0.3s;
+    }
+
+    .name-endreo { font-size: 9pt; font-weight: 800; color: #38bdf8; }
+    .name-janaina { font-size: 9pt; font-weight: 800; color: #fb7185; }
+
+    .act-badge {
+        display: inline-block;
+        font-size: 7pt;
+        font-weight: 700;
+        padding: 2px 5px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        margin: 4px 0;
+    }
+    .act-corrida { background: rgba(56, 189, 248, 0.2); color: #e0f2fe; border: 1px solid rgba(56, 189, 248, 0.4); }
+    .act-fortalecimento { background: rgba(251, 113, 133, 0.2); color: #ffe4e6; border: 1px solid rgba(251, 113, 133, 0.4); }
+
+    .check-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 5px;
+        cursor: pointer;
+    }
+
+    .check-container input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .check-label { font-size: 7.5pt; color: #94a3b8; font-weight: 700; }
+
+    .person-block.completed {
+        background: rgba(34, 197, 94, 0.15);
+        border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+    .person-block.completed .check-label { color: #4ade80; }
+
+    .off-block { margin: auto 0; padding: 20px 0; }
+    .tag-off { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; font-size: 10pt; font-weight: 800; padding: 5px 8px; border-radius: 6px; }
 </style>
 </head>
 <body>
 
-<div id="status" class="status-loading">🔄 Sincronizando com a planilha...</div>
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <div>
+            <div class="main-title">DASHBOARD FITNESS</div>
+            <div class="subtitle">Sincronizado na Nuvem • Google Sheets</div>
+        </div>
+        <div id="status" class="status-bar">🔄 Carregando dados...</div>
+        <div class="filter-group">
+            <select id="monthSelect" onchange="renderDashboard()">
+                <!-- Preenchido via JS -->
+            </select>
+        </div>
+    </div>
+
+    <!-- PAINEL DE MÉTRICAS -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-title">🏆 Placar do Mês</div>
+            <div class="scoreboard">
+                <div class="score-box">
+                    <div class="name-endreo">ENDREO</div>
+                    <div id="countEndreo" class="score-endreo">0</div>
+                </div>
+                <div style="font-size: 14pt; color: #64748b; font-weight: bold;">VS</div>
+                <div class="score-box">
+                    <div class="name-janaina">JANAÍNA</div>
+                    <div id="countJanaina" class="score-janaina">0</div>
+                </div>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="barEndreo" class="bar-endreo"></div>
+                <div id="barJanaina" class="bar-janaina"></div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title" style="color: #38bdf8;">📊 Métricas de Endreo</div>
+            <div class="detail-list">
+                <div class="detail-item"><span>🏃‍♂️ Corridas:</span> <strong id="endreoCorridas">0</strong></div>
+                <div class="detail-item"><span>🏋️‍♂️ Fortalecimento:</span> <strong id="endreoFort">0</strong></div>
+                <div class="detail-item"><span>🎯 Conclusão:</span> <strong id="endreoTaxa">0%</strong></div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title" style="color: #fb7185;">📊 Métricas de Janaína</div>
+            <div class="detail-list">
+                <div class="detail-item"><span>🏃‍♀️ Corridas:</span> <strong id="janainaCorridas">0</strong></div>
+                <div class="detail-item"><span>🏋️‍♀️ Fortalecimento:</span> <strong id="janainaFort">0</strong></div>
+                <div class="detail-item"><span>🎯 Conclusão:</span> <strong id="janainaTaxa">0%</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRID SEMANAL -->
+    <div class="schedule-grid">
+        <!-- SEGUNDA -->
+        <div class="card">
+            <div class="day-title">Segunda</div>
+            <div class="day-short">FEIRA</div>
+            <div class="person-block" id="blk-seg-endreo">
+                <div class="name-endreo">ENDREO</div>
+                <span class="act-badge act-corrida">🏃‍♂️ Corrida</span>
+                <label class="check-container">
+                    <input type="checkbox" onchange="registerActivity('seg-endreo', 'Endreo', 'Corrida', this)">
+                    <span class="check-label">Feito</span>
+                </label>
+            </div>
+            <div class="person-block" id="blk-seg-janaina">
+                <div class="name-janaina">JANAÍNA</div>
+                <span class="act-badge act-fortalecimento">🏋️‍♀️ Fortalecimento</span>
+                <label class="check-container">
+                    <input type="checkbox" onchange="registerActivity('seg-janaina', 'Janaína', 'Fortalecimento', this)">
+                    <span class="check-label">Feito</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- TERÇA -->
+        <div class="card">
+            <div class="day-title">Terça</div>
+            <div class="day-short">FEIRA</div>
+            <div class="person-block" id="blk-ter-janaina">
+                <div class="name-janaina">JANAÍNA</div>
+                <span class="act-badge act-corrida">🏃‍♀️ Corrida</span>
+                <label class="check-container">
+                    <input type="checkbox" onchange="registerActivity('ter-janaina', 'Janaína', 'Corrida', this)">
+                    <span class="check-label">Feito</span>
+                </label>
+            </div>
+            <div class="person-block" id="blk-ter-endreo">
+                <div class="name-endreo">ENDREO</div>
+                <span class="act-badge act-fortalecimento">🏋️‍♂️ Fortalecimento</span>
+                <label class="check-container">
+                    <input type="checkbox" onchange="registerActivity('ter-endreo', 'Endreo', 'Fortalecimento', this)">
+                    <span class="check-label">Feito</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- QUARTA -->
+        <div class="card" style="background: rgba(15, 23, 42, 0.4);">
+            <div class="day-title">Quarta</div>
+            <div class="day-short">FEIRA</div>
+            <div class="off-block">
+                <div style="font-size: 20pt; margin-bottom: 5px;">🌙</div>
+                <div class="tag-off">DAY OFF</div>
+            </div>
+        </div>
+
+        <!-- QUINTA -->
+        <div class="card">
+            <div class="day-title">Quinta</div>
+            <div class="day-short">FEIRA</div>
+            <div class="person-block" id="blk-qui-janaina">
+                <div class="name-janaina">JANAÍNA</div>
+                <span class="act-badge act-corrida">🏃‍♀️ Corrida</span>
+                <label class="check-container">
+                    <input type="checkbox" onchange="registerActivity('qui-janaina', 'Janaína', 'Corrida', this)">
+                    <span class="check-label">Feito</span>
+                </label>
+            </div>
+            <div class="person-block" id="blk-qui-endreo">
+                <div class="name-endreo">ENDREO</div>
+                <span class="act-badge act-fortalecimento">🏋️‍♂️ Fortalecimento</span>
+                <label class="check-container">
+                    <input type="checkbox" onchange="registerActivity('qui-endreo', 'Endreo', 'Fortalecimento', this)">
+                    <span class="check-label">Feito</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- SEXTA -->
+        <div class="card">
+            <div class="day-title">Sexta</div>
+            <div class="day-short">FEIRA</div>
+            <div class="person-block" id="blk-sex-endreo">
+                <div class="name-endreo">ENDREO</div>
+                <span class="act-badge act-corrida">🏃‍♂️ Corrida</span>
+                <label class="check-container">
+                    <input type="checkbox" onchange="registerActivity('sex-endreo', 'Endreo', 'Corrida', this)">
+                    <span class="check-label">Feito</span>
+                </label>
+            </div>
+            <div class="person-block" id="blk-sex-janaina">
+                <div class="name-janaina">JANAÍNA</div>
+                <span class="act-badge act-fortalecimento">🏋️‍♀️ Fortalecimento</span>
+                <label class="check-container">
+                    <input type="checkbox" onchange="registerActivity('sex-janaina', 'Janaína', 'Fortalecimento', this)">
+                    <span class="check-label">Feito</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- SÁBADO -->
+        <div class="card">
+            <div class="day-title">Sábado</div>
+            <div class="day-short">FIM DE SEMANA</div>
+            <div class="person-block" id="blk-sab-janaina">
+                <div class="name-janaina">JANAÍNA</div>
+                <span class="act-badge act-corrida">🏃‍♀️ Corrida</span>
+                <label class="check-container">
+                    <input type="checkbox" onchange="registerActivity('sab-janaina', 'Janaína', 'Corrida', this)">
+                    <span class="check-label">Feito</span>
+                </label>
+            </div>
+            <div class="person-block" id="blk-sab-endreo">
+                <div class="name-endreo">ENDREO</div>
+                <span class="act-badge act-corrida">🏃‍♂️ Corrida</span>
+                <label class="check-container">
+                    <input type="checkbox" onchange="registerActivity('sab-endreo', 'Endreo', 'Corrida', this)">
+                    <span class="check-label">Feito</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- DOMINGO -->
+        <div class="card" style="background: rgba(15, 23, 42, 0.4);">
+            <div class="day-title">Domingo</div>
+            <div class="day-short">Final de Semana</div>
+            <div class="off-block">
+                <div style="font-size: 20pt; margin-bottom: 5px;">🌙</div>
+                <div class="tag-off">DAY OFF</div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
 
 <script>
-    // Cole aqui a URL do seu Google Apps Script!
+    // Cole aqui o seu link do App da Web do Google Sheets
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0gHMBbnhRNtalDSVyDO3HtecNK94uNc0h1C_g2bY1Q9-1VxW_NQJWXW_BK3GUOWvH7A/exec";
+    
+    let fitnessHistory = [];
 
-    // Envia dados para o Google Sheets ao clicar na caixa
-    async function syncCheckToSheets(slotId, person, activityType, isChecked) {
-        document.getElementById("status").innerText = "⏳ Salvando na nuvem...";
+    document.addEventListener("DOMContentLoaded", () => {
+        populateMonthFilter();
+        loadDataFromSheets();
+    });
+
+    function populateMonthFilter() {
+        const select = document.getElementById("monthSelect");
+        const now = new Date();
+        for (let i = 0; i < 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            const monthName = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            
+            const opt = document.createElement("option");
+            opt.value = monthKey;
+            opt.innerText = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+            select.appendChild(opt);
+        }
+    }
+
+    async function loadDataFromSheets() {
+        const statusEl = document.getElementById("status");
+        statusEl.innerText = "🔄 Sincronizando com a nuvem...";
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=read`);
+            const data = await res.json();
+            
+            // Converte as linhas da planilha para objetos JS
+            fitnessHistory = data.slice(1).map(row => ({
+                id: row[0],
+                person: row[1],
+                type: row[2],
+                date: row[3],
+                monthKey: row[4],
+                checked: row[5]
+            }));
+
+            statusEl.innerText = "✅ Sincronizado";
+            renderDashboard();
+        } catch (err) {
+            statusEl.innerText = "⚠️ Erro ao carregar (Verifique o SCRIPT_URL)";
+        }
+    }
+
+    async function registerActivity(slotId, person, activityType, checkboxElement) {
+        const statusEl = document.getElementById("status");
+        statusEl.innerText = "⏳ Salvando...";
+
+        const selectedMonth = document.getElementById("monthSelect").value;
         const now = new Date();
         const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const isChecked = checkboxElement.checked;
 
         const payload = {
             action: isChecked ? "save" : "clear",
@@ -28,16 +457,77 @@
             person: person,
             type: activityType,
             date: now.toISOString(),
-            monthKey: currentMonthKey,
-            checked: isChecked
+            monthKey: currentMonthKey
         };
 
-        await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: JSON.stringify(payload)
+        // Atualização local rápida
+        if (isChecked) {
+            fitnessHistory.push(payload);
+        } else {
+            fitnessHistory = fitnessHistory.filter(item => !(item.slotId === slotId && item.monthKey === selectedMonth));
+        }
+        renderDashboard();
+
+        // Envio para a planilha
+        try {
+            await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            statusEl.innerText = "✅ Sincronizado";
+        } catch (err) {
+            statusEl.innerText = "⚠️ Erro ao salvar na nuvem";
+        }
+    }
+
+    function renderDashboard() {
+        const selectedMonth = document.getElementById("monthSelect").value;
+        const monthData = fitnessHistory.filter(item => item.monthKey === selectedMonth);
+
+        document.querySelectorAll('.person-block').forEach(blk => blk.classList.remove('completed'));
+        document.querySelectorAll('input[type="checkbox"]').forEach(chk => chk.checked = false);
+
+        monthData.forEach(item => {
+            const chk = document.querySelector(`input[onchange*="'${item.id || item.slotId}'"]`);
+            if (chk) {
+                chk.checked = true;
+                chk.closest('.person-block').classList.add('completed');
+            }
         });
 
-        document.getElementById("status").innerText = "✅ Sincronizado!";
+        const endreoLogs = monthData.filter(i => i.person === 'Endreo');
+        const janainaLogs = monthData.filter(i => i.person === 'Janaína');
+
+        const eCorrida = endreoLogs.filter(i => i.type === 'Corrida').length;
+        const eFort = endreoLogs.filter(i => i.type === 'Fortalecimento').length;
+
+        const jCorrida = janainaLogs.filter(i => i.type === 'Corrida').length;
+        const jFort = janainaLogs.filter(i => i.type === 'Fortalecimento').length;
+
+        document.getElementById("countEndreo").innerText = endreoLogs.length;
+        document.getElementById("countJanaina").innerText = janainaLogs.length;
+
+        document.getElementById("endreoCorridas").innerText = eCorrida;
+        document.getElementById("endreoFort").innerText = eFort;
+        
+        document.getElementById("janainaCorridas").innerText = jCorrida;
+        document.getElementById("janainaFort").innerText = jFort;
+
+        const targetMonthly = 18;
+        document.getElementById("endreoTaxa").innerText = `${Math.min(100, Math.round((endreoLogs.length / targetMonthly) * 100))}%`;
+        document.getElementById("janainaTaxa").innerText = `${Math.min(100, Math.round((janainaLogs.length / targetMonthly) * 100))}%`;
+
+        const total = endreoLogs.length + janainaLogs.length;
+        const barE = document.getElementById("barEndreo");
+        const barJ = document.getElementById("barJanaina");
+
+        if (total === 0) {
+            barE.style.width = "50%";
+            barJ.style.width = "50%";
+        } else {
+            barE.style.width = `${(endreoLogs.length / total) * 100}%`;
+            barJ.style.width = `${(janainaLogs.length / total) * 100}%`;
+        }
     }
 </script>
 </body>
