@@ -356,10 +356,12 @@
 </div>
 
 <script>
+    // ⚠️ COLOQUE SUA URL DO GOOGLE SCRIPT AQUI DENTRO DAS ASPAS
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0gHMBbnhRNtalDSVyDO3HtecNK94uNc0h1C_g2bY1Q9-1VxW_NQJWXW_BK3GUOWvH7A/exec";
+    
     let fitnessHistory = [];
 
-    // Retorna a identificação da semana atual no ano (ex: 2026-W37)
+    // Calcula a semana atual do ano
     function getCurrentWeekKey() {
         const d = new Date();
         d.setHours(0, 0, 0, 0);
@@ -391,10 +393,11 @@
 
     async function loadDataFromSheets() {
         const statusEl = document.getElementById("status");
-        statusEl.innerText = "🔄 Sincronizando com a nuvem...";
+        statusEl.innerText = "🔄 Sincronizando...";
 
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=read`);
+            // Parâmetro &t para forçar ignorar o cache do navegador
+            const res = await fetch(`${SCRIPT_URL}?action=read&t=${new Date().getTime()}`);
             const data = await res.json();
             
             if (data.length > 1) {
@@ -410,16 +413,16 @@
                 fitnessHistory = [];
             }
 
-            statusEl.innerText = "✅ Sincronizado";
+            statusEl.innerText = "✅ Banco Atualizado";
             renderDashboard();
         } catch (err) {
-            statusEl.innerText = "⚠️ Erro ao carregar dados";
+            statusEl.innerText = "⚠️ Erro de conexão";
         }
     }
 
     async function registerActivity(slotId, person, activityType, checkboxElement) {
         const statusEl = document.getElementById("status");
-        statusEl.innerText = "⏳ Salvando...";
+        statusEl.innerText = "⏳ Salvando na nuvem...";
 
         const selectedMonth = document.getElementById("monthSelect").value;
         const now = new Date();
@@ -427,7 +430,7 @@
         const isChecked = checkboxElement.checked;
         const action = isChecked ? "save" : "clear";
 
-        // Atualização da lista local para sincronização instantânea na tela
+        // Salva localmente para atualizar a tela sem esperar a internet
         fitnessHistory = fitnessHistory.filter(item => !(item.slotId === slotId && item.weekKey === currentWeekKey));
         if (isChecked) {
             fitnessHistory.push({
@@ -445,9 +448,9 @@
 
         try {
             await fetch(url, { mode: 'no-cors' });
-            statusEl.innerText = "✅ Sincronizado";
+            statusEl.innerText = "✅ Salvo";
         } catch (err) {
-            statusEl.innerText = "⚠️ Erro ao enviar";
+            statusEl.innerText = "⚠️ Erro ao salvar";
         }
     }
 
@@ -455,17 +458,15 @@
         const selectedMonth = document.getElementById("monthSelect").value;
         const currentWeekKey = getCurrentWeekKey();
 
-        // 1. Dados do Mês Selecionado (Para os Contadores e Métricas)
+        // Separação lógica: Dados do Mês e Dados da Semana
         const monthData = fitnessHistory.filter(item => String(item.monthKey) === String(selectedMonth));
-
-        // 2. Dados da Semana Atual (Para marcar as caixinhas do painel visual)
         const weekData = fitnessHistory.filter(item => String(item.weekKey) === String(currentWeekKey));
 
-        // Limpa estado visual das caixas
+        // Zera as caixas da tela antes de pintar as corretas
         document.querySelectorAll('.person-block').forEach(blk => blk.classList.remove('completed'));
         document.querySelectorAll('input[type="checkbox"]').forEach(chk => chk.checked = false);
 
-        // Marca APENAS os treinos realizados na SEMANA ATUAL
+        // Só marca as caixas da SEMANA ATUAL
         weekData.forEach(item => {
             const chk = document.querySelector(`input[onchange*="'${item.slotId}'"]`);
             if (chk) {
@@ -474,7 +475,7 @@
             }
         });
 
-        // Calcula MÉTRICAS ACUMULADAS DO MÊS
+        // Contabiliza tudo pelo MÊS SELECIONADO
         const endreoLogs = monthData.filter(i => i.person === 'Endreo');
         const janainaLogs = monthData.filter(i => i.person === 'Janaína');
 
@@ -490,8 +491,9 @@
         document.getElementById("endreoCorridas").innerText = eCorrida;
         document.getElementById("endreoFort").innerText = eFort;
         
+        // Correção aplicada nesta linha!
         document.getElementById("janainaCorridas").innerText = jCorrida;
-        document.getElementById("janainaFort.innerText = jFort;
+        document.getElementById("janainaFort").innerText = jFort; 
 
         const targetMonthly = 18;
         document.getElementById("endreoTaxa").innerText = `${Math.min(100, Math.round((endreoLogs.length / targetMonthly) * 100))}%`;
